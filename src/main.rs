@@ -1,6 +1,8 @@
 use std::env;
 use std::io;
 
+type ResultStrErr<T> = std::result::Result<T, &'static str>;
+
 #[derive(Debug)]
 pub struct LineSpec {
     start: u32,
@@ -8,7 +10,7 @@ pub struct LineSpec {
 }
 
 impl LineSpec {
-    fn new(start: u32, end: u32) -> Result<Self, &'static str> {
+    fn new(start: u32, end: u32) -> ResultStrErr<Self> {
         if end < start {
             Err("End line before start line")?
         };
@@ -38,14 +40,14 @@ fn getline(_stdin: io::Stdin, line_spec: LineSpec) {
     println!("{:?}", line_spec)
 }
 
-fn parse_args(args: &Vec<String>) -> Result<LineSpec, &'static str> {
+fn parse_args(args: &Vec<String>) -> ResultStrErr<LineSpec> {
     if args.len() != 2 {
         return Err("Invalid number of arguments"); // ?
     }
     parse_line_spec(&args[1])
 }
 
-pub fn parse_line_spec(arg: &String) -> Result<LineSpec, &'static str> {
+pub fn parse_line_spec(arg: &String) -> ResultStrErr<LineSpec> {
     let fragments: Vec<&str> = arg.split(":").collect();
     let start = parse_number(&fragments[0])?;
     let end = match fragments.get(1) {
@@ -55,7 +57,7 @@ pub fn parse_line_spec(arg: &String) -> Result<LineSpec, &'static str> {
     Ok(LineSpec::new(start, end))?
 }
 
-fn parse_number(number: &str) -> Result<u32, &'static str> {
+fn parse_number(number: &str) -> ResultStrErr<u32> {
     number.parse::<u32>().or(Err("Invalid line spec"))
 }
 
