@@ -12,6 +12,9 @@ pub struct LineSpec {
 
 impl LineSpec {
     fn new(start: u32, end: u32) -> ResultStrErr<Self> {
+        if start == 0 {
+            Err("Line number must start at 1")?
+        }
         if end < start {
             Err("End line before start line")?
         };
@@ -75,7 +78,7 @@ mod tests {
     use super::*;
 
     #[test]
-    fn test_line_spec_parse() {
+    fn test_parse_line_spec() {
         let line_spec = parse_line_spec(&String::from("3")).unwrap();
         assert_eq!(line_spec.start, 3);
         assert_eq!(line_spec.end, 3);
@@ -85,8 +88,15 @@ mod tests {
     }
 
     #[test]
+    fn test_line_spec_new() {
+        assert!(LineSpec::new(3, 5).is_ok());
+        assert!(LineSpec::new(5, 3).is_err());
+        assert!(LineSpec::new(0, 5).is_err());
+    }
+
+    #[test]
     fn test_line_spec_line_in() {
-        let line_spec = parse_line_spec(&String::from("3:5")).unwrap();
+        let line_spec = LineSpec::new(3, 5).unwrap();
         assert!(!line_spec.line_in(2));
         assert!(line_spec.line_in(3));
         assert!(line_spec.line_in(4));
