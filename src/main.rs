@@ -1,5 +1,6 @@
 use std::env;
 use std::io;
+use std::io::prelude::*;
 
 type ResultStrErr<T> = std::result::Result<T, &'static str>;
 
@@ -15,6 +16,10 @@ impl LineSpec {
             Err("End line before start line")?
         };
         Ok(Self { start: start, end: end})
+    }
+
+    fn line_in(&self, line_number: u32) -> bool {
+        line_number >= self.start && line_number <= self.end
     }
 }
 
@@ -36,8 +41,12 @@ fn main() {
     };
 }
 
-fn getline(_stdin: io::Stdin, line_spec: LineSpec) {
-    println!("{:?}", line_spec)
+fn getline(stdin: io::Stdin, line_spec: LineSpec) {
+    let line_iter = stdin.lock().lines().enumerate().
+                    filter(|enumeration| line_spec.line_in(enumeration.0 as u32 + 1));
+    for enumeration in line_iter {
+        println!("{}", enumeration.1.unwrap());
+    }
 }
 
 fn parse_args(args: &Vec<String>) -> ResultStrErr<LineSpec> {
@@ -66,12 +75,22 @@ mod tests {
     use super::*;
 
     #[test]
-    fn test_parse_line_spec() {
+    fn test_line_spec_parse() {
         let line_spec = parse_line_spec(&String::from("3")).unwrap();
         assert_eq!(line_spec.start, 3);
         assert_eq!(line_spec.end, 3);
         let line_spec = parse_line_spec(&String::from("3:5")).unwrap();
         assert_eq!(line_spec.start, 3);
         assert_eq!(line_spec.end, 5);
+    }
+
+    #[test]
+    fn test_line_spec_line_in() {
+        let line_spec = parse_line_spec(&String::from("3:5")).unwrap();
+        assert!(!line_spec.line_in(2));
+        assert!(line_spec.line_in(3));
+        assert!(line_spec.line_in(4));
+        assert!(line_spec.line_in(5));
+        assert!(!line_spec.line_in(6));
     }
 }
