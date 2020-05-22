@@ -13,10 +13,10 @@ pub struct LineSpec {
 impl LineSpec {
     fn new(start: u32, end: u32) -> ResultStrErr<Self> {
         if start == 0 {
-            Err("Line number must start at 1")?
+            return Err("Line number must start at 1");
         }
         if end < start {
-            Err("End line before start line")?
+            return Err("End line before start line");
         };
         Ok(Self { start: start, end: end})
     }
@@ -54,7 +54,7 @@ fn getline(stdin: io::Stdin, line_spec: LineSpec) {
 
 fn parse_args(args: &Vec<String>) -> ResultStrErr<LineSpec> {
     if args.len() != 2 {
-        return Err("Invalid number of arguments"); // ?
+        return Err("Invalid number of arguments");
     }
     parse_line_spec(&args[1])
 }
@@ -66,7 +66,7 @@ pub fn parse_line_spec(arg: &String) -> ResultStrErr<LineSpec> {
         Some(number) => parse_number(&number)?,
         None => start
     };
-    Ok(LineSpec::new(start, end))?
+    LineSpec::new(start, end)
 }
 
 fn parse_number(number: &str) -> ResultStrErr<u32> {
