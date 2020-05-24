@@ -11,7 +11,17 @@ pub struct LineSpec {
 }
 
 impl LineSpec {
-    fn new(start: u32, end: u32) -> ResultStrErr<Self> {
+    fn new(spec: &str) -> ResultStrErr<Self> {
+        let fragments: Vec<&str> = spec.split(":").collect();
+        let start = parse_number(&fragments[0])?;
+        let end = match fragments.get(1) {
+            Some(number) => parse_number(&number)?,
+            None => start
+        };
+        Self::init(start, end)
+    }
+
+    fn init(start: u32, end: u32) -> ResultStrErr<Self> {
         if start == 0 {
             return Err("Line number must start at 1");
         }
@@ -56,17 +66,7 @@ fn parse_args(args: &Vec<String>) -> ResultStrErr<LineSpec> {
     if args.len() != 2 {
         return Err("Invalid number of arguments");
     }
-    parse_line_spec(&args[1])
-}
-
-pub fn parse_line_spec(arg: &String) -> ResultStrErr<LineSpec> {
-    let fragments: Vec<&str> = arg.split(":").collect();
-    let start = parse_number(&fragments[0])?;
-    let end = match fragments.get(1) {
-        Some(number) => parse_number(&number)?,
-        None => start
-    };
-    LineSpec::new(start, end)
+    LineSpec::new(&args[1])
 }
 
 fn parse_number(number: &str) -> ResultStrErr<u32> {
@@ -78,25 +78,15 @@ mod tests {
     use super::*;
 
     #[test]
-    fn test_parse_line_spec() {
-        let line_spec = parse_line_spec(&String::from("3")).unwrap();
-        assert_eq!(line_spec.start, 3);
-        assert_eq!(line_spec.end, 3);
-        let line_spec = parse_line_spec(&String::from("3:5")).unwrap();
-        assert_eq!(line_spec.start, 3);
-        assert_eq!(line_spec.end, 5);
-    }
-
-    #[test]
     fn test_line_spec_new() {
-        assert!(LineSpec::new(3, 5).is_ok());
-        assert!(LineSpec::new(5, 3).is_err());
-        assert!(LineSpec::new(0, 5).is_err());
+        assert!(LineSpec::new("3:5").is_ok());
+        assert!(LineSpec::new("5:3").is_err());
+        assert!(LineSpec::new("0:5").is_err());
     }
 
     #[test]
     fn test_line_spec_line_in() {
-        let line_spec = LineSpec::new(3, 5).unwrap();
+        let line_spec = LineSpec::new("3:5").unwrap();
         assert!(!line_spec.line_in(2));
         assert!(line_spec.line_in(3));
         assert!(line_spec.line_in(4));
