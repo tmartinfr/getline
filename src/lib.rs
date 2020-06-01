@@ -14,11 +14,11 @@ pub mod linespec {
     /// # Examples
     /// ```
     /// # use ::getline::linespec::LineSpec;
-    /// assert!(LineSpec::new("3:5").is_ok());
-    /// assert!(LineSpec::new("5:3").is_err());
-    /// assert!(LineSpec::new("0:5").is_err());
+    /// assert!(LineSpec::from_spec("3:5").is_ok());
+    /// assert!(LineSpec::from_spec("5:3").is_err());
+    /// assert!(LineSpec::from_spec("0:5").is_err());
     ///
-    /// let line_spec = LineSpec::new("3:5").unwrap();
+    /// let line_spec = LineSpec::from_spec("3:5").unwrap();
     /// assert!(!line_spec.line_in(2));
     /// assert!(line_spec.line_in(3));
     /// assert!(line_spec.line_in(4));
@@ -26,17 +26,7 @@ pub mod linespec {
     /// assert!(!line_spec.line_in(6));
     /// ```
     impl LineSpec {
-        pub fn new(spec: &str) -> super::ResultStrErr<Self> {
-            let fragments: Vec<&str> = spec.split(":").collect();
-            let start = parse_number(&fragments[0])?;
-            let end = match fragments.get(1) {
-                Some(number) => parse_number(&number)?,
-                None => start
-            };
-            Self::init(start, end)
-        }
-
-        fn init(start: u32, end: u32) -> super::ResultStrErr<Self> {
+        fn new(start: u32, end: u32) -> super::ResultStrErr<Self> {
             if start == 0 {
                 return Err("Line number must start at 1");
             }
@@ -44,6 +34,16 @@ pub mod linespec {
                 return Err("End line before start line");
             };
             Ok(Self { start: start, end: end})
+        }
+
+        pub fn from_spec(spec: &str) -> super::ResultStrErr<Self> {
+            let fragments: Vec<&str> = spec.split(":").collect();
+            let start = parse_number(&fragments[0])?;
+            let end = match fragments.get(1) {
+                Some(number) => parse_number(&number)?,
+                None => start
+            };
+            Self::new(start, end)
         }
 
         pub fn line_in(&self, line_number: u32) -> bool {

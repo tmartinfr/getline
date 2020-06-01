@@ -26,5 +26,5 @@ fn parse_args(args: &Vec<String>) -> ResultStrErr<LineSpec> {
     if args.len() != 2 {
         return Err("Invalid number of arguments");
     }
-    LineSpec::new(&args[1])
+    LineSpec::from_spec(&args[1])
 }
