@@ -1,7 +1,7 @@
 use std::env;
 use std::io;
-pub use ::getline::linespec::LineSpec;
-pub use ::getline::getline;
+use ::getline::linespec::LineSpec;
+use ::getline::getline;
 use ::getline::ResultStrErr;
 
 fn help(prog_name: &String, error: &str) {
