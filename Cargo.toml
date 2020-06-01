@@ -4,6 +4,8 @@ version = "0.1.1"
 authors = ["Thomas Martin <thomas@oopss.org>"]
 edition = "2018"
 description = "Extract given line numbers from text stream"
+documentation = "https://docs.rs/getline"
+repository = "https://github.com/tmartinfr/getline/"
 license = "MIT"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
