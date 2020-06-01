@@ -1,5 +1,4 @@
-use std::io;
-use std::io::prelude::*;
+use std::io::BufRead;
 
 pub type ResultStrErr<T> = std::result::Result<T, &'static str>;
 
@@ -57,8 +56,8 @@ pub mod linespec {
     }
 }
 
-pub fn getline(stdin: io::Stdin, line_spec: linespec::LineSpec) {
-    let line_iter = stdin.lock().lines().enumerate().
+pub fn getline<T>(stream: T, line_spec: linespec::LineSpec) where T: BufRead {
+    let line_iter = stream.lines().enumerate().
                     filter(|enumeration| line_spec.line_in(enumeration.0 as u32 + 1));
     for enumeration in line_iter {
         println!("{}", enumeration.1.unwrap());

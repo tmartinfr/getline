@@ -17,7 +17,7 @@ fn main() {
     let args: Vec<String> = env::args().collect();
 
     match parse_args(&args) {
-        Ok(line_spec) => getline(io::stdin(), line_spec),
+        Ok(line_spec) => getline(io::stdin().lock(), line_spec),
         Err(e) => help(&args[0], e)
     };
 }
