@@ -56,6 +56,9 @@ pub mod linespec {
     }
 }
 
+pub use linespec::LineSpec;
+
+/// Extract lines from buffer based on given specification
 pub fn getline<T>(stream: T, line_spec: linespec::LineSpec) where T: BufRead {
     let line_iter = stream.lines().enumerate().
                     filter(|enumeration| line_spec.line_in(enumeration.0 as u32 + 1));

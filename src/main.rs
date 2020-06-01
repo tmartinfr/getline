@@ -1,6 +1,6 @@
 use std::env;
 use std::io;
-use ::getline::linespec::LineSpec;
+use ::getline::LineSpec;
 use ::getline::getline;
 use ::getline::ResultStrErr;
 
